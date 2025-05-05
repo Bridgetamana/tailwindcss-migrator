@@ -1,0 +1,57 @@
+{
+  "name": "tailwind-migrator",
+  "displayName": "Tailwind CSS Version Migrator",
+  "description": "Converts Tailwind CSS v3 syntax to v4 in Next.js projects",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Formatters",
+    "Snippets"
+  ],
+  "activationEvents": [
+    "onLanguage:css",
+    "onLanguage:postcss"
+],
+  "main": "./dist/extension.js",
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "clean": "rm -rf dist"
+  },
+ "contributes": {
+    "commands": [
+      {
+        "command": "tailwind-migrator.convertFile",
+        "title": "Tailwind: Convert to v4",
+        "category": "Tailwind"
+      }
+    ],
+    "configuration": {
+      "title": "Tailwind Migrator",
+      "properties": {
+        "tailwindMigrator.autoConvert": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically convert Tailwind v3 to v4 on file save"
+        },
+        "tailwindMigrator.showDiff": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show diff before applying changes"
+        }
+      }
+    }
+  },
+  "devDependencies": {
+  "@types/mocha": "^10.0.10",
+  "@types/node": "^20.11.19",
+  "@types/vscode": "^1.85.0",
+  "typescript": "^5.2.2",
+  "@types/glob": "^8.1.0",
+  "@vscode/test-electron": "^2.3.7",
+  "mocha": "^10.2.0"
+}
+}
