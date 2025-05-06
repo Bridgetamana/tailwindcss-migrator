@@ -5,19 +5,37 @@ import { DocumentBuilder } from './document-builder';
 
 export class TailwindMigrator {
     static async convert(text: string): Promise<string> {
+        text = this.cleanExistingV4Artifacts(text);
         text = this.replaceDirectives(text);
         const { lightVars, darkVars } = this.extractThemeVariables(text);
-        text = this.removeOriginalVars(text);        
+        text = this.removeOriginalVars(text);
         const themeSection = ThemeGenerator.generate(lightVars, darkVars);
         text = LayerConverter.convert(text);
         return DocumentBuilder.build(themeSection, text);
     }
 
-    private static replaceDirectives(text: string): string {
+    private static cleanExistingV4Artifacts(text: string): string {
         return text
-            .replace(/@tailwind\s+base[^;]*;?/g, '@import "tailwindcss/preflight";')
+            .replace(/@theme\s*{\s*}/g, '')
+            .replace(/@import\s+"tailwindcss[^"]*";?\s*/g, '')
+            .replace(/@layer\s+\w+\s*{\s*}/g, '');
+    }
+
+    private static replaceDirectives(text: string): string {
+        const fontImports = text.match(/@import\s+url\([^;]+\);?\s*/g)?.join('\n') || '';
+        text = text.replace(/@import\s+url\([^;]+\);?\s*/g, '');
+
+        text = text
+            .replace(/@tailwind\s+base[^;]*;?/g, '')
             .replace(/@tailwind\s+components[^;]*;?/g, '')
-            .replace(/@tailwind\s+utilities[^;]*;?/g, '@import "tailwindcss";');
+            .replace(/@tailwind\s+utilities[^;]*;?/g, '');
+
+        return [
+            fontImports,
+            '@import "tailwindcss/preflight";',
+            '@import "tailwindcss";',
+            text
+        ].filter(Boolean).join('\n\n');
     }
 
     private static extractThemeVariables(text: string) {
@@ -32,7 +50,7 @@ export class TailwindMigrator {
                 }
             });
         }
-        
+
         const darkMatch = text.match(/\.dark\s*{([^}]+)}/);
         if (darkMatch) {
             darkMatch[1].split(';').forEach(declaration => {
@@ -42,7 +60,7 @@ export class TailwindMigrator {
                 }
             });
         }
-        
+
         return { lightVars, darkVars };
     }
 

@@ -2,15 +2,16 @@ import * as vscode from 'vscode';
 import { TailwindMigrator } from './migrator';
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('Tailwind CSS Migrator activated');
-
     const convertCommand = vscode.commands.registerCommand('tailwind-migrator.convertFile', async () => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
             vscode.window.showErrorMessage('No active editor found!');
             return;
         }
-
+        if (!['css', 'postcss'].includes(editor.document.languageId)) {
+            vscode.window.showWarningMessage('Tailwind migration only works with CSS files');
+            return;
+        }
         try {
             const originalText = editor.document.getText();
             const convertedText = await TailwindMigrator.convert(originalText);

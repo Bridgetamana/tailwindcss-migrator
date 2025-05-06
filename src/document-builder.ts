@@ -1,16 +1,20 @@
 export class DocumentBuilder {
     static build(themeSection: string, processedContent: string): string {
-        // Preserve original imports (fonts, etc.)
-        const imports = processedContent.match(/@import\s+url\([^;]+\);?\s*/g)?.join('\n') || '';
-        
+        processedContent = processedContent.replace(/@theme\s*{\s*}/g, '');
+            if (processedContent.includes('@theme {')) {
+            processedContent = processedContent.replace(/@theme\s*{[\s\S]*?}/, '');
+        }
+        const fontImports = processedContent.match(/@import\s+url\([^;]+\);?\s*/g)?.join('\n') || '';
         processedContent = processedContent.replace(/@import\s+url\([^;]+\);?\s*/g, '');
-            processedContent = processedContent
-            .replace(/\n{3,}/g, '\n\n')
-            .trim();
-            return [
-            imports,
+        
+        const tailwindImports = processedContent.match(/@import\s+"tailwindcss[^"]*";?\s*/g)?.join('\n') || '';
+        processedContent = processedContent.replace(/@import\s+"tailwindcss[^"]*";?\s*/g, '');
+        processedContent = processedContent.replace(/@layer\s+\w+\s*{\s*}/g, '');
+        return [
+            fontImports,
+            tailwindImports,
             themeSection,
             processedContent
-        ].filter(Boolean).join('\n\n');
+        ].filter(Boolean).join('\n\n').replace(/\n{3,}/g, '\n\n').trim();
     }
 }
