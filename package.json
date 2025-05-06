@@ -21,7 +21,7 @@
   "name": "tailwind-migrator",
   "displayName": "Tailwind CSS Version Migrator",
   "description": "Converts Tailwind CSS v3 syntax to v4 in Next.js projects",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -32,7 +32,7 @@
   "activationEvents": [
     "onLanguage:css",
     "onLanguage:postcss"
-],
+  ],
   "main": "./dist/extension.js",
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -40,7 +40,7 @@
     "watch": "tsc -watch -p ./",
     "clean": "rm -rf dist"
   },
- "contributes": {
+  "contributes": {
     "commands": [
       {
         "command": "tailwind-migrator.convertFile",
@@ -65,12 +65,12 @@
     }
   },
   "devDependencies": {
-  "@types/mocha": "^10.0.10",
-  "@types/node": "^20.11.19",
-  "@types/vscode": "^1.85.0",
-  "typescript": "^5.2.2",
-  "@types/glob": "^8.1.0",
-  "@vscode/test-electron": "^2.3.7",
-  "mocha": "^10.2.0"
-}
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^20.11.19",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.2.2",
+    "@types/glob": "^8.1.0",
+    "@vscode/test-electron": "^2.3.7",
+    "mocha": "^10.2.0"
+  }
 }
