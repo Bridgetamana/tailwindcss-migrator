@@ -1,4 +1,23 @@
 {
+  "publisher": "Bridget",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bridgetamana/tailwindcss-migrator"
+  },
+  "bugs": {
+    "url": "https://github.com/Bridgetamana/tailwindcss-migrator/issues"
+  },
+  "homepage": "https://github.com/Bridgetamana/tailwindcss-migrator",
+  "license": "MIT",
+  "icon": "images/icon.png",
+  "keywords": [
+    "vscode",
+    "tailwind",
+    "css",
+    "migrator",
+    "tailwindcss",
+    "tailwindcss-migrator"
+  ],
   "name": "tailwind-migrator",
   "displayName": "Tailwind CSS Version Migrator",
   "description": "Converts Tailwind CSS v3 syntax to v4 in Next.js projects",
