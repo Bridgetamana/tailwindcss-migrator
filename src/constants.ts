@@ -11,6 +11,5 @@ export const TAILWIND_V3_DIRECTIVES = [
 ] as const;
 
 export const TAILWIND_V4_IMPORTS = [
-    '@import "tailwindcss/preflight";',
     '@import "tailwindcss";'
 ];
