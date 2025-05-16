@@ -1,23 +1,31 @@
 import { ThemeGenerator } from './theme-generator';
 import { LayerConverter } from './layer-converter';
 import { DocumentBuilder } from './document-builder';
+import { ColorConverter } from './color-converter';
 
 export class TailwindMigrator {
-    static async convert(text: string): Promise<string> {
+    static async convert(text: string, useOklch: boolean = true): Promise<string> {
         text = this.cleanExistingV4Artifacts(text);
         text = this.replaceDirectives(text);
-        const { lightVars, darkVars, processedText } = this.extractThemeVariables(text);
+        const { lightVars, darkVars, processedText, hasDarkMode } = this.extractThemeVariables(text, useOklch);
 
         const themeSection = ThemeGenerator.generate(lightVars, darkVars);
 
-        const convertedText = LayerConverter.convert(processedText);
+        let customVariants = '';
+        if (hasDarkMode) {
+            customVariants = '@custom-variant dark (&:is(.dark *));';
+        }
 
-        return DocumentBuilder.build(themeSection, convertedText);
+        const convertedText = LayerConverter.convert(processedText);
+        const finalText = [convertedText, customVariants].filter(Boolean).join('\n\n');
+
+        return DocumentBuilder.build(themeSection, finalText);
     }
 
     private static cleanExistingV4Artifacts(text: string): string {
         return text
             .replace(/@theme\s*{\s*}/g, '')
+            .replace(/@custom-variant\s+dark\s+\(&:is\(\.dark\s+\*\)\);/g, '')
             .replace(/@theme\s*inline\s*{\s*}/g, '')
             .replace(/@import\s+"tailwindcss[^"]*";?\s*/g, '')
             .replace(/@layer\s+\w+\s*{\s*}/g, '');
@@ -39,33 +47,34 @@ export class TailwindMigrator {
         ].filter(Boolean).join('\n\n');
     }
 
-    private static extractThemeVariables(text: string) {
+    private static extractThemeVariables(text: string, useOklch: boolean = true) {
         const lightVars: Record<string, string> = {};
         const darkVars: Record<string, string> = {};
         let processedText = text;
+        let hasDarkMode = false;
+
         const baseLayerRootDarkRegex = /@layer\s+base\s*{[\s\S]*?:root\s*{([^}]+)}[\s\S]*?\.dark\s*{([^}]+)}[\s\S]*?}/;
         const baseLayerRootDarkMatch = text.match(baseLayerRootDarkRegex);
 
         if (baseLayerRootDarkMatch) {
+            hasDarkMode = true;
             const rootContent = baseLayerRootDarkMatch[1];
             const darkContent = baseLayerRootDarkMatch[2];
 
             const rootVars = this.processVariableDeclarations(rootContent);
             Object.entries(rootVars).forEach(([varName, value]) => {
-                const colorValue = this.formatHslValue(value);
                 lightVars[`--color-${varName.substring(2)}`] = `var(${varName})`;
             });
 
             const darkVarsObj = this.processVariableDeclarations(darkContent);
             Object.entries(darkVarsObj).forEach(([varName, value]) => {
-                const colorValue = this.formatHslValue(value);
                 darkVars[`--color-${varName.substring(2)}`] = `var(${varName})`;
             });
 
             const rootBlock = `:root {\n  ${Object.entries(rootVars).map(([k, v]) =>
-                `${k}: ${this.formatHslValue(v)};`).join('\n  ')}\n}`;
+                `${k}: ${this.formatColorValue(v, useOklch)};`).join('\n  ')}\n}`;
             const darkBlock = `\n\n.dark {\n  ${Object.entries(darkVarsObj).map(([k, v]) =>
-                `${k}: ${this.formatHslValue(v)};`).join('\n  ')}\n}`;
+                `${k}: ${this.formatColorValue(v, useOklch)};`).join('\n  ')}\n}`;
 
             processedText = processedText.replace(baseLayerRootDarkRegex, `${rootBlock}${darkBlock}`);
         } else {
@@ -76,12 +85,11 @@ export class TailwindMigrator {
                 const rootContent = baseLayerRootMatch[1];
                 const rootVars = this.processVariableDeclarations(rootContent);
                 Object.entries(rootVars).forEach(([varName, value]) => {
-                    const colorValue = this.formatHslValue(value);
                     lightVars[`--color-${varName.substring(2)}`] = `var(${varName})`;
                 });
 
                 const rootBlock = `:root {\n  ${Object.entries(rootVars).map(([k, v]) =>
-                    `${k}: ${this.formatHslValue(v)};`).join('\n  ')}\n}`;
+                    `${k}: ${this.formatColorValue(v, useOklch)};`).join('\n  ')}\n}`;
 
                 processedText = processedText.replace(baseLayerRootRegex, rootBlock);
             }
@@ -97,13 +105,14 @@ export class TailwindMigrator {
 
         const standaloneDarkMatch = processedText.match(/\.dark\s*{([^}]+)}/);
         if (standaloneDarkMatch) {
+            hasDarkMode = true;
             const darkVarsObj = this.processVariableDeclarations(standaloneDarkMatch[1]);
             Object.entries(darkVarsObj).forEach(([varName, value]) => {
                 darkVars[`--color-${varName.substring(2)}`] = `var(${varName})`;
             });
         }
 
-        return { lightVars, darkVars, processedText };
+        return { lightVars, darkVars, processedText, hasDarkMode };
     }
 
     private static processVariableDeclarations(content: string): Record<string, string> {
@@ -117,9 +126,17 @@ export class TailwindMigrator {
         return vars;
     }
 
-    private static formatHslValue(value: string): string {
+    private static formatColorValue(value: string, useOklch: boolean = true): string {
         if (value.trim().match(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/)) {
-            return `hsl(${value})`;
+            if (useOklch) {
+                try {
+                    return ColorConverter.hslToOklch(value);
+                } catch (e) {
+                    return `hsl(${value})`;
+                }
+            } else {
+                return `hsl(${value})`;
+            }
         }
         return value;
     }
