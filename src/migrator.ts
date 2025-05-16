@@ -17,9 +17,7 @@ export class TailwindMigrator {
         }
 
         const convertedText = LayerConverter.convert(processedText);
-        const finalText = [convertedText, customVariants].filter(Boolean).join('\n\n');
-
-        return DocumentBuilder.build(themeSection, finalText);
+        return DocumentBuilder.build(themeSection, convertedText, customVariants);
     }
 
     private static cleanExistingV4Artifacts(text: string): string {
