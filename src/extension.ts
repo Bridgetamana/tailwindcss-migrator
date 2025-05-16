@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 import { TailwindMigrator } from './migrator';
+import { ColorProvider } from './color-preview';
+import { SUPPORTED_LANGUAGES } from './constants';  
 
 export function activate(context: vscode.ExtensionContext) {
     const convertCommand = vscode.commands.registerCommand('tailwind-migrator.convertFile', async () => {
@@ -38,6 +40,11 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.commands.executeCommand('tailwind-migrator.convertFile');
         }
     });
+
+    const colorProvider = vscode.languages.registerColorProvider(
+        SUPPORTED_LANGUAGES,
+        new ColorProvider()
+    );
 
     context.subscriptions.push(convertCommand, saveHandler);
 }
