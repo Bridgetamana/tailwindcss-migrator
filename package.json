@@ -21,7 +21,7 @@
   "name": "tailwind-migrator",
   "displayName": "Tailwind CSS Version Migrator",
   "description": "Converts Tailwind CSS v3 syntax to v4 in Next.js projects",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "engines": {
     "vscode": "^1.85.0"
   },

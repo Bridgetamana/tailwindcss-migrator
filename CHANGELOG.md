@@ -2,7 +2,7 @@
 
 All notable changes to the "tailwind-migrator" extension will be documented in this file.
 
-## [1.0.0] - 2025-05-16
+## [0.1.1] - 2025-05-16
 
 ### Added
 
