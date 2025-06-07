@@ -36,7 +36,19 @@ export function activate(context: vscode.ExtensionContext) {
                 editBuilder.replace(fullRange, convertedText);
             });
 
-            vscode.window.showInformationMessage('Successfully converted to Tailwind CSS v4!');
+            const undoAction = 'Undo';
+            vscode.window.showInformationMessage('Successfully converted to Tailwind CSS v4!', undoAction).then(async (selected) => {
+                if (selected === undoAction) {
+                    await editor.edit(editBuilder => {
+                        const fullRange = new vscode.Range(
+                            editor.document.positionAt(0),
+                            editor.document.positionAt(convertedText.length)
+                        );
+                        editBuilder.replace(fullRange, originalText);
+                    });
+                    vscode.window.showInformationMessage('Undo: File reverted to its previous state.');
+                }
+            });
         } catch (error) {
             vscode.window.showErrorMessage(
                 `Conversion failed: ${error instanceof Error ? error.message : String(error)}`
