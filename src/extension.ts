@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { TailwindMigrator } from './migrator';
 import { ColorProvider } from './color-preview';
-import { SUPPORTED_LANGUAGES } from './constants';  
+import { SUPPORTED_LANGUAGES } from './constants';
 
 export function activate(context: vscode.ExtensionContext) {
     const convertCommand = vscode.commands.registerCommand('tailwind-migrator.convertFile', async () => {
@@ -14,10 +14,20 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showWarningMessage('Tailwind migration only works with CSS files');
             return;
         }
+        const confirm = await vscode.window.showWarningMessage(
+            'This will convert your file to Tailwind CSS v4 syntax and overwrite its contents. Do you want to continue?',
+            { modal: true },
+            'Yes',
+            'No'
+        );
+        if (confirm !== 'Yes') {
+            vscode.window.showInformationMessage('Migration cancelled.');
+            return;
+        }
         try {
             const originalText = editor.document.getText();
             const convertedText = await TailwindMigrator.convert(originalText);
-            
+
             await editor.edit(editBuilder => {
                 const fullRange = new vscode.Range(
                     editor.document.positionAt(0),
@@ -25,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
                 );
                 editBuilder.replace(fullRange, convertedText);
             });
-            
+
             vscode.window.showInformationMessage('Successfully converted to Tailwind CSS v4!');
         } catch (error) {
             vscode.window.showErrorMessage(
@@ -49,4 +59,4 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(convertCommand, saveHandler);
 }
 
-export function deactivate() {}
+export function deactivate() { }
