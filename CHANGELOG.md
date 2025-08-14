@@ -24,4 +24,15 @@ All notable changes to the "tailwind-migrator" extension will be documented in t
 
 ## [Unreleased]
 
-- Initial release
+### Added
+- Diff preview before migration changes
+- Dry-run mode for previewing changes without modifying files
+- Improved error handling and logging
+- Linting and formatting enforced via ESLint, Husky pre-commit hook, and GitHub Actions
+
+### Changed
+- Confirmation prompt only shown after diff preview
+- Migration changes now applied using WorkspaceEdit for reliability
+
+### Fixed
+- Resolved issue with migration failing on closed editors
