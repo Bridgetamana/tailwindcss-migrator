@@ -2,6 +2,13 @@
 
 All notable changes to the "tailwind-migrator" extension will be documented in this file.
 
+## [0.1.2] - 2025-06-08
+
+### Added
+
+- Confirmation dialog before migration
+- Undo option after migration to revert changes
+
 ## [0.1.1] - 2025-05-16
 
 ### Added

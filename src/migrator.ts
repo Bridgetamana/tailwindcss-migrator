@@ -4,9 +4,19 @@ import { DocumentBuilder } from './document-builder';
 import { ColorConverter } from './color-converter';
 
 export class TailwindMigrator {
-    static async convert(text: string, useOklch: boolean = true): Promise<string> {
+    static async convert(text: string, useOklch: boolean = true, customRules: Array<{pattern: string, replacement: string}> = []): Promise<string> {
         text = this.cleanExistingV4Artifacts(text);
         text = this.replaceDirectives(text);
+        if (Array.isArray(customRules)) {
+            for (const rule of customRules) {
+                try {
+                    const regex = new RegExp(rule.pattern, 'g');
+                    text = text.replace(regex, rule.replacement);
+                } catch (e) {
+                    console.error(`Invalid custom rule: ${rule.pattern}`, e);
+                }
+            }
+        }
         const { lightVars, darkVars, processedText, hasDarkMode } = this.extractThemeVariables(text, useOklch);
 
         const themeSection = ThemeGenerator.generate(lightVars, darkVars);

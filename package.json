@@ -21,7 +21,7 @@
   "name": "tailwind-migrator",
   "displayName": "Tailwind CSS Version Migrator",
   "description": "Converts Tailwind CSS v3 syntax to v4 in Next.js projects",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -38,7 +38,8 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "lint": "eslint . --ext .ts"
   },
   "contributes": {
     "commands": [
@@ -60,17 +61,45 @@
           "type": "boolean",
           "default": true,
           "description": "Show diff before applying changes"
+        },
+        "tailwindMigrator.dryRun": {
+          "type": "boolean",
+          "default": false,
+          "description": "Preview migration changes without modifying files"
+        },
+        "tailwindMigrator.customRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pattern": {
+                "type": "string"
+              },
+              "replacement": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "pattern",
+              "replacement"
+            ]
+          },
+          "default": [],
+          "description": "Custom migration rules (regex pattern and replacement)"
         }
       }
     }
   },
   "devDependencies": {
+    "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "^20.11.19",
     "@types/vscode": "^1.85.0",
-    "typescript": "^5.2.2",
-    "@types/glob": "^8.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.1",
+    "@typescript-eslint/parser": "^8.39.1",
     "@vscode/test-electron": "^2.3.7",
-    "mocha": "^10.2.0"
+    "eslint": "^9.33.0",
+    "mocha": "^10.2.0",
+    "typescript": "^5.2.2"
   }
 }
