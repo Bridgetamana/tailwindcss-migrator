@@ -28,15 +28,14 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
         let targetEditor: vscode.TextEditor | undefined = undefined;
-        let rightUri: vscode.Uri | undefined = undefined;
         if (showDiff || dryRun) {
             const leftUri = editor.document.uri;
-            rightUri = vscode.Uri.parse(`untitled:Converted-${editor.document.fileName}`);
+            const rightUri = vscode.Uri.parse(`untitled:Converted-${editor.document.fileName}`);
             await vscode.workspace.openTextDocument(rightUri).then(async doc => {
                 const edit = new vscode.WorkspaceEdit();
-                edit.insert(rightUri!, new vscode.Position(0, 0), convertedText);
+                edit.insert(rightUri, new vscode.Position(0, 0), convertedText);
                 await vscode.workspace.applyEdit(edit);
-                await vscode.commands.executeCommand('vscode.diff', leftUri, rightUri!, 'Tailwind Migration Preview');
+                await vscode.commands.executeCommand('vscode.diff', leftUri, rightUri, 'Tailwind Migration Preview');
             });
             if (dryRun) {
                 vscode.window.showInformationMessage('Dry-run: No changes applied.');
@@ -93,7 +92,7 @@ export function activate(context: vscode.ExtensionContext) {
         new ColorProvider()
     );
 
-    context.subscriptions.push(convertCommand, saveHandler);
+    context.subscriptions.push(convertCommand, saveHandler, colorProvider);
 }
 
 export function deactivate() { }

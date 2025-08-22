@@ -13,7 +13,7 @@ export class DocumentBuilder {
         return [
             fontImports,
             tailwindImports,
-            customVariants,  // Add custom variants here, right after tailwind import
+            customVariants,
             themeSection,
             processedContent
         ].filter(Boolean).join('\n\n').replace(/\n{3,}/g, '\n\n').trim();
