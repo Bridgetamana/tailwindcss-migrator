@@ -47,6 +47,11 @@
         "command": "tailwind-migrator.convertFile",
         "title": "Tailwind: Convert to v4",
         "category": "Tailwind"
+      },
+      {
+        "command": "tailwind-migrator.migrateWorkspace",
+        "title": "Tailwind: Migrate Workspace to v4",
+        "category": "Tailwind"
       }
     ],
     "configuration": {
@@ -86,6 +91,36 @@
           },
           "default": [],
           "description": "Custom migration rules (regex pattern and replacement)"
+        },
+        "tailwindMigrator.includeGlobs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["**/*.{css,pcss,postcss,scss,sass,less}"],
+          "description": "Glob patterns to include when running workspace migration"
+        },
+        "tailwindMigrator.excludeGlobs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["**/node_modules/**", "**/dist/**", "**/out/**"],
+          "description": "Glob patterns to exclude during workspace migration"
+        },
+        "tailwindMigrator.preset": {
+          "type": "string",
+          "enum": ["generic", "nextjs", "vite", "astro", "sveltekit", "vue"],
+          "default": "generic",
+          "description": "Project preset that influences migration heuristics"
+        },
+        "tailwindMigrator.mode": {
+          "type": "string",
+          "enum": ["safe", "strict"],
+          "default": "safe",
+          "description": "Safe = conservative changes; Strict = apply all deterministic changes"
+        },
+        "tailwindMigrator.maxFileSizeKB": {
+          "type": "number",
+          "default": 1024,
+          "minimum": 1,
+          "description": "Skip files larger than this size (in KB) during migration"
         }
       }
     }

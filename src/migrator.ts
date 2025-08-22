@@ -5,6 +5,10 @@ import { ColorConverter } from './color-converter';
 
 export class TailwindMigrator {
     static async convert(text: string, useOklch: boolean = true, customRules: Array<{pattern: string, replacement: string}> = []): Promise<string> {
+        const patterns = /@tailwind\s+(base|components|utilities)|@layer\s+base|:root\s*\{|\.dark\s*\{/;
+        if (!patterns.test(text) && (!Array.isArray(customRules) || customRules.length === 0)) {
+            return text;
+        }
         text = this.cleanExistingV4Artifacts(text);
         text = this.replaceDirectives(text);
         if (Array.isArray(customRules)) {
